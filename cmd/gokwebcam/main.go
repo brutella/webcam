@@ -271,10 +271,6 @@ func encodeToImage(wc *webcam.Webcam, back chan struct{}, fi chan []byte, li cha
 func serveHTTP(addr string, li chan *bytes.Buffer) {
 	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("connect from", r.RemoteAddr, r.URL)
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
 
 		//remove stale image
 		<-li
@@ -292,10 +288,6 @@ func serveHTTP(addr string, li chan *bytes.Buffer) {
 
 	http.HandleFunc("/video", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("connect from", r.RemoteAddr, r.URL)
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
 
 		//remove stale image
 		<-li
