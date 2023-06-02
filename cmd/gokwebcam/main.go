@@ -76,7 +76,7 @@ func main() {
 
 	cam, err := webcam.Open(*dev)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 	defer cam.Close()
 
@@ -99,16 +99,14 @@ FMT:
 
 		} else if *fmtstr == s {
 			if !supportedFormats[f] {
-				log.Println(format_desc[f], "format is not supported, exiting")
-				return
+				log.Fatalln(format_desc[f], "format is not supported, exiting")
 			}
 			format = f
 			break
 		}
 	}
 	if format == 0 {
-		log.Println("No format found, exiting")
-		return
+		log.Fatal("No format found, exiting")
 	}
 
 	// select frame size
@@ -131,15 +129,13 @@ FMT:
 		}
 	}
 	if size == nil {
-		log.Println("No matching frame size, exiting")
-		return
+		log.Fatal("No matching frame size, exiting")
 	}
 
 	fmt.Fprintln(os.Stderr, "Requesting", format_desc[format], size.GetString())
 	f, w, h, err := cam.SetImageFormat(format, uint32(size.MaxWidth), uint32(size.MaxHeight))
 	if err != nil {
-		log.Println("SetImageFormat return error", err)
-		return
+		log.Fatal("SetImageFormat return error", err)
 
 	}
 	fmt.Fprintf(os.Stderr, "Resulting image format: %s %dx%d\n", format_desc[f], w, h)
@@ -152,8 +148,7 @@ FMT:
 	// start streaming
 	err = cam.StartStreaming()
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	var (
@@ -170,26 +165,19 @@ FMT:
 
 	for {
 		err = cam.WaitForFrame(timeout)
-		if err != nil {
-			log.Println(err)
-			continue
-			return
-		}
-
 		switch err.(type) {
 		case nil:
 		case *webcam.Timeout:
 			log.Println(err)
 			continue
 		default:
-			log.Println(err)
-			return
+			log.Fatal(err)
 		}
 
 		frame, err := cam.ReadFrame()
 		if err != nil {
 			log.Println(err)
-			return
+			continue
 		}
 		if len(frame) != 0 {
 
@@ -242,9 +230,8 @@ func encodeToImage(wc *webcam.Webcam, back chan struct{}, fi chan []byte, li cha
 			}
 			if err := jpeg.Encode(buf, yuyv, nil); err != nil {
 				log.Fatal(err)
-				return
 			}
-		case V4L2_PIX_FMT_MJPG:
+		case V4L2_PIX_FMT_MJPG, V4L2_PIX_FMT_PJPG:
 			buf.Write(frame)
 		default:
 			log.Fatal("invalid format ?")
