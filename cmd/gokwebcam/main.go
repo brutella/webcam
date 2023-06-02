@@ -10,6 +10,7 @@ import (
 	"image/jpeg"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"net/textproto"
 	"os"
 	"sort"
@@ -161,7 +162,7 @@ FMT:
 		back chan struct{}      = make(chan struct{})
 	)
 	go encodeToImage(cam, back, fi, li, w, h, f)
-	go http(*addr, li)
+	go serveHTTP(*addr, li)
 
 	timeout := uint32(5) // 5 seconds
 	start := time.Now()
@@ -267,7 +268,7 @@ func encodeToImage(wc *webcam.Webcam, back chan struct{}, fi chan []byte, li cha
 	}
 }
 
-func http(addr string, li chan *bytes.Buffer) {
+func serveHTTP(addr string, li chan *bytes.Buffer) {
 	http.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("connect from", r.RemoteAddr, r.URL)
 		if r.URL.Path != "/" {
