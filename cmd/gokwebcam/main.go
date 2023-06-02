@@ -60,12 +60,19 @@ func main() {
 
 	// modprobe the uvcvideo driver
 	for _, mod := range []string{
+		"kernel/drivers/media/common/videobuf2/videobuf2_common.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2_v4l2.ko",
+		"kernel/drivers/media/common/uvc.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2_memops.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2_vmalloc.ko",
 		"kernel/drivers/media/usb/uvc/uvcvideo.ko",
 	} {
 		if err := loadModule(mod); err != nil && !os.IsNotExist(err) {
 			log.Fatal(err)
 		}
 	}
+
+	log.Println("kernel modules loaded")
 
 	cam, err := webcam.Open(*dev)
 	if err != nil {
