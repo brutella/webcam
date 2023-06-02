@@ -1,5 +1,3 @@
-//go:build linux
-
 // This linux program provides access to v4l2 video devices
 // via the http enpdoints `/image` and `/video`.
 package main
