@@ -17,7 +17,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
-	"time"loadModule
+	"time"
 
 	"github.com/blackjack/webcam"
 )
