@@ -60,11 +60,11 @@ func main() {
 
 	// modprobe the uvcvideo driver
 	for _, mod := range []string{
-		"kernel/drivers/media/common/videobuf2/videobuf2_common.ko",
-		"kernel/drivers/media/common/videobuf2/videobuf2_v4l2.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2-common.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2-v4l2.ko",
 		"kernel/drivers/media/common/uvc.ko",
-		"kernel/drivers/media/common/videobuf2/videobuf2_memops.ko",
-		"kernel/drivers/media/common/videobuf2/videobuf2_vmalloc.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2-memops.ko",
+		"kernel/drivers/media/common/videobuf2/videobuf2-vmalloc.ko",
 		"kernel/drivers/media/usb/uvc/uvcvideo.ko",
 	} {
 		if err := loadModule(mod); err != nil && !os.IsNotExist(err) {
