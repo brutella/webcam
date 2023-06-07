@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/blackjack/webcam"
+	"golang.org/x/image/draw"
 )
 
 const (
@@ -264,9 +265,29 @@ func serveHTTP(addr string, li chan *bytes.Buffer) {
 
 		img := <-li
 
+		buf := img.Bytes()
+		if str := r.FormValue("s"); str != "" {
+			var w, h int
+			n, _ := fmt.Sscanf(str, "%dx%d", &w, &h)
+			if n == 2 {
+				// Decode the image (from PNG to image.Image):
+				src, _ := jpeg.Decode(img)
+
+				// Set the expected size that you want:
+				dst := image.NewRGBA(image.Rect(0, 0, w, h))
+
+				// Resize:
+				draw.NearestNeighbor.Scale(dst, dst.Rect, src, src.Bounds(), draw.Over, nil)
+
+				var resized bytes.Buffer
+				jpeg.Encode(&resized, dst, &jpeg.Options{Quality: 90})
+				buf = resized.Bytes()
+			}
+		}
+
 		w.Header().Set("Content-Type", "image/jpeg")
 
-		if _, err := w.Write(img.Bytes()); err != nil {
+		if _, err := w.Write(buf); err != nil {
 			log.Println(err)
 			return
 		}
